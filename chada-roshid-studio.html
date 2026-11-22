@@ -193,6 +193,21 @@ table.pt{width:calc(100% - 108px);margin:26px 54px 0;border-collapse:collapse;fo
 .msg svg{flex:none}
 .msg p{margin:0;font-family:'Tiro Bangla','Hind Siliguri',serif;font-size:26px;line-height:1.45;color:var(--c1)}
 .note.w{color:#b3261e}.note.w::before{background:#b3261e}
+#lgSheet .pt th,#lgSheet .pt td{white-space:nowrap}
+#lgSheet .pt tfoot td{background:#062a21;color:#f3d994;border-color:#062a21}
+#lgSheet .pt tfoot td b{color:#f3d994}
+
+/* সর্বমোট সারি */
+.lg tfoot td,#lgSheet .pt tfoot td{background:linear-gradient(135deg,#0d5a45,#062a21);color:#f3d994;font-weight:700;border:0;border-left:1px solid rgba(201,160,80,.3)}
+.lg tfoot td{border-top:3px solid #c9a050;font-size:15px}
+.lg tfoot td.tl,#lgSheet .pt tfoot td.tl{border-left:0;color:#fff;font-family:'Tiro Bangla','Hind Siliguri',serif;font-weight:400}
+.lg tfoot td.tl{font-size:18px}
+.lg tfoot td:first-child{background:linear-gradient(135deg,#0d5a45,#062a21)}
+#lgSheet .pt tfoot td{border-top:5px solid #c9a050;padding:18px 8px;font-size:26px;letter-spacing:.4px}
+#lgSheet .pt tfoot td.tl{font-size:32px;padding-left:20px;letter-spacing:.6px}
+#lgSheet .pt tfoot td.tg{font-size:30px;color:#fff;background:linear-gradient(135deg,#127a58,#0a4a38)}
+#lgSheet .pt tfoot td.td{font-size:30px;color:#ffb4a2}
+.lg tfoot td.tg{color:#fff}.lg tfoot td.td{color:#ffb4a2}
 </style>
 </head>
 <body>
@@ -438,7 +453,7 @@ function tableHTML(L){
   const body=L.rows.map(r=>'<tr><td>'+r.name+'</td><td>'+bn(r.mobile)+'</td>'+
     L.tm.map(m=>m in r.paid?'<td class="ok">✓ '+bn(r.paid[m])+'</td>':'<td class="no">বাকি</td>').join('')+
     '<td><b>'+bn(r.got)+'</b></td><td>'+(r.due?'<span style="color:#c0392b">'+bn(r.due)+'</span>':'<span class="ok">—</span>')+'</td></tr>').join('');
-  const foot='<tr><td>সর্বমোট</td><td></td>'+L.colSum.map(v=>'<td>'+bn(v)+'</td>').join('')+'<td>'+bn(L.got)+'</td><td>'+bn(L.due)+'</td></tr>';
+  const foot='<tr class="tr"><td class="tl">সর্বমোট</td><td></td>'+L.colSum.map(v=>'<td>'+bn(v)+'</td>').join('')+'<td class="tg">'+bn(L.got)+'</td><td class="td">'+bn(L.due)+'</td></tr>';
   return '<table class="lg"><thead><tr>'+th+'</tr></thead><tbody>'+body+'</tbody><tfoot>'+foot+'</tfoot></table>';
 }
 function drawLedger(){
@@ -465,9 +480,15 @@ function sheetHTML(L){
     '<div class="pf"><span>মোট '+bn(L.rows.length)+' জন দাতার হিসাব</span><span class="pg">জাযাকাল্লাহ খাইরন</span></div></div>';
 }
 async function sheetCanvas(L){
-  $('lgSheet').innerHTML=sheetHTML(L);
+  const sh=$('lgSheet');
+  sh.style.width='1500px';
+  sh.innerHTML=sheetHTML(L);
   await document.fonts.ready;
-  return html2canvas($('lgSheet'),{scale:2,backgroundColor:'#fcfbf7'});
+  const tw=sh.querySelector('table.pt').offsetWidth;
+  sh.style.width=Math.max(1500,tw+108+6)+'px';
+  await new Promise(r=>requestAnimationFrame(()=>r()));
+  const w=sh.offsetWidth,h=sh.offsetHeight;
+  return html2canvas(sh,{scale:2,backgroundColor:'#fcfbf7',width:w,height:h,windowWidth:w+40,x:0,y:0,scrollX:0,scrollY:0});
 }
 $('jp').addEventListener('click',()=>busy($('jp'),'JPG',async()=>{
   const L=ledger();
