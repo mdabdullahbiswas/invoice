@@ -470,28 +470,29 @@ function drawLedger(){
     '<div class="card2"><small>সম্পূর্ণ পরিশোধ</small><b>'+bn(L.full)+'/'+bn(L.rows.length)+' জন</b></div>';
   $('lgTable').innerHTML=tableHTML(L);
 }
-function sheetHTML(L){
+function sheetHTML(L,cols){
   const d=today().split('-'),dt=bn(d[2]+'-'+d[1]+'-'+d[0]);
   return '<div class="ps"><div class="ph"><div><div class="po">'+($('org').value||'চাঁদার হিসাব')+'</div><h2>সংগ্রহের হিসাব</h2></div>'+
     '<div class="pd">তারিখঃ '+dt+'<br><small>ধরা মাস: '+L.tm.map(m=>MONTHS[m]).join(', ')+'</small></div></div>'+
     '<div class="pc"><div><small>মোট দাতা</small><b>'+bn(L.rows.length)+' জন</b></div><div><small>মোট জমা</small><b>'+bn(L.got)+' টাকা</b></div>'+
     '<div class="w"><small>মোট বকেয়া</small><b>'+bn(L.due)+' টাকা</b></div><div><small>সম্পূর্ণ পরিশোধ</small><b>'+bn(L.full)+'/'+bn(L.rows.length)+' জন</b></div></div>'+
-    tableHTML(L).replace('class="lg"','class="pt"')+
+    tableHTML(L).replace('class="lg"','class="pt" style="table-layout:fixed"').replace('<thead>','<colgroup>'+cols.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup><thead>')+
     '<div class="pf"><span>মোট '+bn(L.rows.length)+' জন দাতার হিসাব</span><span class="pg">জাযাকাল্লাহ খাইরন</span></div></div>';
 }
 async function sheetCanvas(L){
-  const sh=$('lgSheet');
-  sh.style.width='4000px';
-  sh.innerHTML=sheetHTML(L);
   await document.fonts.ready;
-  const tb=sh.querySelector('table.pt');
-  tb.style.width='auto';
-  const natural=Math.ceil(tb.getBoundingClientRect().width);
-  tb.style.width='';
-  sh.style.width=Math.max(1500,natural+108+6+220)+'px';
+  const cx=document.createElement('canvas').getContext('2d');
+  cx.font='21px "Anek Bangla","Hind Siliguri",sans-serif';
+  const nameW=Math.ceil(Math.max(280,...L.rows.map(r=>cx.measureText(r.name).width+70)));
+  const mobW=Math.ceil(Math.max(200,...L.rows.map(r=>cx.measureText(bn(r.mobile)).width+60)));
+  const cols=[nameW,mobW,...L.tm.map(()=>170),180,180];
+  const tw=cols.reduce((a,b)=>a+b,0);
+  const sh=$('lgSheet');
+  sh.style.width=Math.max(1500,tw+114)+'px';
+  sh.innerHTML=sheetHTML(L,cols);
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r())));
   const w=sh.offsetWidth,h=sh.offsetHeight;
-  return html2canvas(sh,{scale:2,backgroundColor:'#fcfbf7',width:w,height:h,windowWidth:w+40,x:0,y:0,scrollX:0,scrollY:0});
+  return html2canvas(sh,{scale:2,backgroundColor:'#fcfbf7',width:w,height:h,windowWidth:w});
 }
 $('jp').addEventListener('click',()=>busy($('jp'),'JPG',async()=>{
   const L=ledger();
