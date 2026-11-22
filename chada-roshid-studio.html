@@ -481,12 +481,15 @@ function sheetHTML(L){
 }
 async function sheetCanvas(L){
   const sh=$('lgSheet');
-  sh.style.width='1500px';
+  sh.style.width='4000px';
   sh.innerHTML=sheetHTML(L);
   await document.fonts.ready;
-  const tw=sh.querySelector('table.pt').offsetWidth;
-  sh.style.width=Math.max(1500,tw+108+6)+'px';
-  await new Promise(r=>requestAnimationFrame(()=>r()));
+  const tb=sh.querySelector('table.pt');
+  tb.style.width='auto';
+  const natural=Math.ceil(tb.getBoundingClientRect().width);
+  tb.style.width='';
+  sh.style.width=Math.max(1500,natural+108+6+220)+'px';
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r())));
   const w=sh.offsetWidth,h=sh.offsetHeight;
   return html2canvas(sh,{scale:2,backgroundColor:'#fcfbf7',width:w,height:h,windowWidth:w+40,x:0,y:0,scrollX:0,scrollY:0});
 }
