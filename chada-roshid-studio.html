@@ -208,6 +208,8 @@ table.pt{width:calc(100% - 108px);margin:26px 54px 0;border-collapse:collapse;fo
 #lgSheet .pt tfoot td.tg{font-size:30px;color:#fff;background:linear-gradient(135deg,#127a58,#0a4a38)}
 #lgSheet .pt tfoot td.td{font-size:30px;color:#ffb4a2}
 .lg tfoot td.tg{color:#fff}.lg tfoot td.td{color:#ffb4a2}
+#lgSheet table.pt{border:2px solid #0a3a2d}
+#lgSheet .pt tbody td:last-child,#lgSheet .pt thead th:last-child{border-right:2px solid #0a3a2d}
 </style>
 </head>
 <body>
@@ -476,7 +478,7 @@ function sheetHTML(L,cols){
     '<div class="pd">তারিখঃ '+dt+'<br><small>ধরা মাস: '+L.tm.map(m=>MONTHS[m]).join(', ')+'</small></div></div>'+
     '<div class="pc"><div><small>মোট দাতা</small><b>'+bn(L.rows.length)+' জন</b></div><div><small>মোট জমা</small><b>'+bn(L.got)+' টাকা</b></div>'+
     '<div class="w"><small>মোট বকেয়া</small><b>'+bn(L.due)+' টাকা</b></div><div><small>সম্পূর্ণ পরিশোধ</small><b>'+bn(L.full)+'/'+bn(L.rows.length)+' জন</b></div></div>'+
-    tableHTML(L).replace('class="lg"','class="pt" style="table-layout:fixed"').replace('<thead>','<colgroup>'+cols.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup><thead>')+
+    tableHTML(L).replace('class="lg"','class="pt" style="table-layout:fixed;width:calc(100% - 108px);margin-right:54px"').replace('<thead>','<colgroup>'+cols.map(w=>'<col style="width:'+w+'px">').join('')+'</colgroup><thead>')+
     '<div class="pf"><span>মোট '+bn(L.rows.length)+' জন দাতার হিসাব</span><span class="pg">জাযাকাল্লাহ খাইরন</span></div></div>';
 }
 async function sheetCanvas(L){
@@ -488,7 +490,7 @@ async function sheetCanvas(L){
   const cols=[nameW,mobW,...L.tm.map(()=>170),180,180];
   const tw=cols.reduce((a,b)=>a+b,0);
   const sh=$('lgSheet');
-  sh.style.width=Math.max(1500,tw+114)+'px';
+  sh.style.width=Math.max(1500,tw+114+90)+'px';
   sh.innerHTML=sheetHTML(L,cols);
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(()=>r())));
   const w=sh.offsetWidth,h=sh.offsetHeight;
